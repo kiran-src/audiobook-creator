@@ -1,13 +1,14 @@
 import os
-import boto3
+from boto3 import client
+import PyPDF2
 
 ACCESS_KEY = os.environ.get("ACCESS_KEY")
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
-poly = boto3.client('polly', region_name='us-west-2',aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
-# print(client.describe_voices(LanguageCode='en-GB', Engine='neural', IncludeAdditionalLanguageCodes=False, NextToken='string'))
+poly = client('polly', region_name='us-west-2', aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET_KEY)
 
-def play_sound(text):
+
+def record_sound(text):
     response = poly.synthesize_speech(Engine='neural',
                                       LanguageCode='en-US',
                                       OutputFormat='mp3',
@@ -18,6 +19,14 @@ def play_sound(text):
 
     with open('voice.mp3', 'wb') as file:
         file.write(body)
-        file.close()
 
-play_sound("Hello")
+
+pdfObj = open('example.pdf', 'rb')
+pdfReader = PyPDF2.PdfFileReader(pdfObj)
+pages = pdfReader.numPages
+# for i in range(pages):
+print(pdfReader.getPage(0).extractText())
+
+pdfObj.close()
+
+record_sound("How are you?")
