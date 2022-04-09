@@ -2,6 +2,12 @@ import os
 from boto3 import client
 import PyPDF2
 
+import pdfplumber
+
+with pdfplumber.open('example.pdf') as pdf:
+    for i in pdf.pages:
+        print(i.extract_text())
+print("AAAAAAAAAA")
 ACCESS_KEY = os.environ.get("ACCESS_KEY")
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
@@ -20,13 +26,13 @@ def record_sound(text):
     with open('voice.mp3', 'wb') as file:
         file.write(body)
 
+text = ''
+with open('example.pdf', 'rb') as pdfObj:
+    pdfReader = PyPDF2.PdfFileReader(pdfObj)
+    pages = pdfReader.numPages
 
-pdfObj = open('example.pdf', 'rb')
-pdfReader = PyPDF2.PdfFileReader(pdfObj)
-pages = pdfReader.numPages
-# for i in range(pages):
-print(pdfReader.getPage(0).extractText())
+    for i in range(pages):
+        print(pdfReader.getPage(i).extractText())
+        text = text + pdfReader.getPage(i).extractText()
 
-pdfObj.close()
-
-record_sound("How are you?")
+record_sound(text)
